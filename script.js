@@ -1,28 +1,31 @@
-document.getElementById("testForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("contactForm");
+  const status = document.getElementById("statusMessage");
 
-  const form = e.target;
-  const formData = new FormData(form);
-  const data = Object.fromEntries(formData.entries());
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form).entries());
 
-  // Replace with your actual n8n webhook URL
-  const webhookUrl = "https://your-n8n-instance/webhook/test";
+    const webhookUrl = "https://your-n8n-instance/webhook/test"; // Replace with your actual URL
 
-  try {
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    try {
+      const res = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (response.ok) {
-      document.getElementById("statusMessage").innerText = "Data sent successfully!";
-      form.reset();
-    } else {
-      document.getElementById("statusMessage").innerText = "Failed to send data.";
+      if (res.ok) {
+        status.textContent = "Message sent successfully!";
+        status.style.color = "green";
+        form.reset();
+      } else {
+        status.textContent = "Failed to send message.";
+        status.style.color = "red";
+      }
+    } catch (err) {
+      status.textContent = "Error sending message.";
+      status.style.color = "red";
     }
-  } catch (error) {
-    console.error(error);
-    document.getElementById("statusMessage").innerText = "Error sending data.";
-  }
+  });
 });
